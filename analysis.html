@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jarak RTH dan LST Surabaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/components/rth-panel.css">
+<link rel="stylesheet" href="assets/css/pages/analysis.css">
+</head>
+<body>
+<div class="app">
+  <aside>
+    <nav aria-label="Versi Web-GIS">
+      <a href="index.html">Versi 1 · Prioritas RTH</a>
+      <a href="analysis.html" aria-current="page">Versi 2 · Jarak RTH &amp; LST</a>
+    </nav>
+    <header>
+      <h1>Jarak ke RTH, Suhu Permukaan, dan Penduduk Kota Surabaya</h1>
+      <p class="sub">LST Landsat 8, 30 Juni 2026 · 221 RTH publik (OSM) · 153 kelurahan, 31 kecamatan · 3.003.860 jiwa</p>
+    </header>
+
+    <section>
+      <h2>Temuan utama</h2>
+      <div class="tiles" id="tiles"></div>
+    </section>
+    <p class="finding" id="temuan"></p>
+
+    <section>
+      <h2>Cari kelurahan</h2>
+      <form class="search" id="cari">
+        <input id="q" list="daftar" placeholder="Ketik nama kelurahan" autocomplete="off" aria-label="Nama kelurahan">
+        <datalist id="daftar"></datalist>
+        <button type="submit">Cari</button>
+      </form>
+      <div class="msg" id="msg"></div>
+    </section>
+
+    <section>
+      <h2>Level wilayah</h2>
+      <div class="seg">
+        <label><input type="radio" name="lvl" id="l-kel" value="kel" checked>Kelurahan</label>
+        <label><input type="radio" name="lvl" id="l-kec" value="kec">Kecamatan</label>
+      </div>
+    </section>
+
+    <section>
+      <h2>Tema peta</h2>
+      <div class="themes">
+        <label><input type="radio" name="tema" id="t-jarak" value="jarak" checked>Jarak ke RTH</label>
+        <label><input type="radio" name="tema" id="t-lst" value="lst">LST rata-rata</label>
+        <label><input type="radio" name="tema" id="t-kep" value="kepadatan">Kepadatan</label>
+        <label><input type="radio" name="tema" id="t-pend" value="penduduk">Jumlah penduduk</label>
+      </div>
+    </section>
+
+    <section>
+      <h2>Lapisan tambahan</h2>
+      <div class="ov">
+        <label><input type="checkbox" id="o-ico" checked>Ikon RTH 🌳</label>
+        <label><input type="checkbox" id="o-rth">Poligon RTH</label>
+        <label><input type="checkbox" id="o-jr">Raster jarak 30 m</label>
+        <label><input type="checkbox" id="o-lst">Citra LST 30 m</label>
+        <label><input type="checkbox" id="o-bm" checked>Peta dasar OSM</label>
+      </div>
+    </section>
+
+    <section>
+      <h2>Legenda</h2>
+      <div id="legend"></div>
+    </section>
+
+    <section>
+      <h2>Detail wilayah</h2>
+      <div id="detail" class="detail"></div>
+    </section>
+
+    <section>
+      <h2>LST rata-rata menurut jarak ke RTH</h2>
+      <div class="key"><span style="--c:var(--s1)">Semua lahan</span><span style="--c:var(--s2)">Lahan terbangun (NDVI &lt; 0,2)</span></div>
+      <svg class="chart" id="bar" viewBox="0 0 400 230" role="img" aria-label="Grafik batang LST menurut kelas jarak ke RTH"></svg>
+    </section>
+
+    <section>
+      <h2>Jarak rata-rata ke RTH vs LST per kelurahan</h2>
+      <svg class="chart" id="sc" viewBox="0 0 400 260" role="img" aria-label="Diagram pencar jarak ke RTH terhadap LST per kelurahan"></svg>
+      <p class="sub" id="sc-note"></p>
+    </section>
+
+    <section>
+      <h2>Rekap per kecamatan</h2>
+      <div class="tbl-wrap"><table id="tkec"><thead></thead><tbody></tbody></table></div>
+      <p class="sub">Klik judul kolom untuk mengurutkan, klik baris untuk melihat kecamatan di peta.</p>
+    </section>
+
+    <section class="note">
+      <h2>Metode dan keterbatasan</h2>
+      <ul>
+        <li>Jarak = jarak lurus setiap piksel daratan 30 m ke tepi RTH publik terdekat, dirata-rata per kelurahan. Kecamatan: rata-rata berbobot jumlah piksel.</li>
+        <li>LST dari band ST_B10 Landsat 8 C2 L2, awan dan air dimasking. NDVI dari band SR_B4 dan SR_B5 citra yang sama; lahan terbangun = NDVI &lt; 0,2.</li>
+        <li>Korelasi memakai Spearman (ρ). Korelasi menunjukkan hubungan, bukan sebab-akibat.</li>
+        <li>"Jauh" dan "panas" = kelas Jenks tertinggi (jarak &gt; 2.004 m, LST &gt; 38,40 °C).</li>
+        <li>RTH di luar batas kota tidak tercakup, sehingga jarak di kelurahan perbatasan bisa berlebih. Vegetasi non-publik (sawah, tambak, mangrove) tidak dihitung sebagai RTH.</li>
+      </ul>
+      <p>Dibuat oleh I Kadek Rangga Sandi Kusuma Wardana, Informatika UPN "Veteran" Jawa Timur, 2026. Peta dasar © OpenStreetMap contributors.</p>
+    </section>
+  </aside>
+  <div id="map" role="region" aria-label="Peta Kota Surabaya"></div>
+</div>
+<div class="tip" id="tip"></div>
+
+<div class="drawer" id="drawer" role="dialog" aria-modal="false" aria-labelledby="dr-nama" aria-hidden="true">
+  <div class="drawer-head"><span class="ico">🌳</span><div><h3 id="dr-nama"></h3><div class="lv" id="dr-lv"></div></div><button class="drawer-x" id="dr-x" aria-label="Tutup informasi RTH">×</button></div>
+  <div class="drawer-body" id="dr-body"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script type="module" src="assets/js/pages/analysis.js"></script>
+</body>
+</html>

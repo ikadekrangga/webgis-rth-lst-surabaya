@@ -1,0 +1,54 @@
+/* priority.css — aturan khusus halaman Versi 1 (prioritas kebutuhan RTH) */
+
+.app { display: grid; grid-template-columns: 360px 1fr; height: 100%; }
+
+aside { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; padding: 0 18px 28px; display: flex; flex-direction: column; gap: 18px; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+.stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; border-top: 4px solid var(--c); }
+
+.stat b { display: block; font-family: var(--font-display); font-size: 22px; font-variant-numeric: tabular-nums; }
+
+.stat span { font-size: 13px; color: var(--muted); }
+
+.themes { display: grid; gap: 6px; }
+
+.themes label, .ov label { display: flex; gap: 10px; align-items: center; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+
+.themes small { color: var(--muted); display: block; font-size: 12.5px; }
+
+.ov { display: grid; gap: 6px; }
+
+.ov label { border: none; padding: 3px 0; }
+
+input[type=range] { width: 100%; accent-color: var(--accent); }
+
+.search button, .btn { padding: 8px 12px; border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 6px; font: inherit; font-weight: 600; cursor: pointer; }
+
+.ramp { height: 12px; border-radius: 2px; background: linear-gradient(90deg,#313695,#4575b4,#74add1,#abd9e9,#e0f3f8,#ffffbf,#fee090,#fdae61,#f46d43,#d73027,#a50026); }
+
+.ramp-l { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.pill { display: inline-block; padding: 1px 9px; border-radius: 999px; color: #fff; font-weight: 600; font-size: 13px; }
+
+td { padding: 3px 0; border-bottom: 1px dashed var(--line); vertical-align: top; }
+
+.empty { color: var(--muted); font-size: 14px; }
+
+.method p, .method li { font-size: 13.5px; color: var(--muted); margin: 0 0 6px; }
+
+.method ul { padding-left: 18px; margin: 0; }
+
+.rth-ico { line-height: 1; text-align: center; filter: drop-shadow(0 1px 1px rgba(0,0,0,.35)); }
+
+.leaflet-popup-content { font-family: var(--font-body); font-size: 14px; }
+
+.leaflet-container { font-family: var(--font-body); }
+
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 58vh auto; height: auto; }
+  html, body { height: auto; }
+  #map { height: 58vh; order: -1; }
+  aside { border-right: none; border-top: 1px solid var(--line); overflow: visible; }
+}
